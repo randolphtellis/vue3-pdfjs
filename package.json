@@ -1,0 +1,96 @@
+{
+  "name": "vue3-pdfjs",
+  "description": "PDF Reader for Vue 3 using Mozilla's PDF.js",
+  "author": {
+    "name": "Randolph Tellis"
+  },
+  "license": "MIT",
+  "version": "0.0.1",
+  "private": false,
+  "main": "cjs/index.js",
+  "browser": "vue3-pdfjs.esm.js",
+  "module": "esm/index.js",
+  "unpkg": "vue3-pdfjs-browser.min.js",
+  "types": "vue3-pdfjs.d.ts",
+  "homepage": "https://github.com/randolphtellis/vue3-pdfjs#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/randolphtellis/vue3-pdfjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/randolphtellis/vue3-pdfjs/issues"
+  },
+  "scripts": {
+    "build:lib": "scripts/build-lib.sh",
+    "build": "npm run build:lib && npm run build-storybook",
+    "test:unit": "vue-cli-service test:unit --passWithNoTests",
+    "lint": "vue-cli-service lint",
+    "start-publish": "cd dist/lib && npm publish",
+    "dev": "start-storybook -p 6006",
+    "build-storybook": "scripts/build-docs.sh"
+  },
+  "dependencies": {
+    "core-js": "^3.6.5",
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.7",
+    "@rollup/plugin-alias": "^3.1.1",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-replace": "^2.3.3",
+    "@rollup/plugin-url": "^5.0.1",
+    "@storybook/addon-actions": "6.2.5",
+    "@storybook/addon-essentials": "6.2.5",
+    "@storybook/addon-links": "6.2.5",
+    "@storybook/vue3": "6.2.5",
+    "@types/jest": "^24.0.19",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-plugin-unit-jest": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/eslint-config-airbnb": "^5.0.2",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "@vue/test-utils": "^2.0.0-0",
+    "autoprefixer": "^9.8.6",
+    "babel-loader": "^8.2.1",
+    "cross-env": "^7.0.2",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^7.0.0-0",
+    "minimist": "^1.2.5",
+    "node-sass": "^4.12.0",
+    "postcss": "^8.1.4",
+    "postcss-nested": "^5.0.1",
+    "postcss-simple-vars": "^6.0.1",
+    "postcss-url": "^10.0.0",
+    "rollup": "^2.32.1",
+    "rollup-plugin-filesize": "^9.0.2",
+    "rollup-plugin-postcss": "^3.1.8",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "rollup-plugin-vue": "^6.0.0-beta.10",
+    "sass": "^1.27.1",
+    "sass-loader": "^8.0.2",
+    "typescript": "~3.9.3",
+    "vue-jest": "^5.0.0-0",
+    "vue-loader": "^16.1.2"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "keywords": [
+    "vue 3 pdf viewer",
+    "vue 3 pdfjs",
+    "vue 3 mozilla pdfjs",
+    "vue 3 pdf component"
+  ]
+}
