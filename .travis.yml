@@ -1,0 +1,26 @@
+os: linux
+dist: xenial
+
+language: node_js
+
+node_js:
+    - 14
+
+jobs:
+  include:
+    - stage: test
+      script: npm run test:unit
+    - stage: build library
+      script: npm run build:lib
+    - stage: build docs
+      script: npm run build-storybook
+    - stage: deploy docs
+      script: npm run build
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        token: $VUE_PDFJS_GITHUB_TRAVIS
+        keep_history: true
+        local_dir: dist/docs
+        on:
+          branch: main
