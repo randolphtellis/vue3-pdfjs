@@ -17,7 +17,7 @@ import typescript from 'rollup-plugin-typescript2'
 
 const projectRoot = path.resolve(__dirname, ".")
 
-const validPkgName = 'Vue3PDFJS'
+const validPkgName = 'Vue3PDF'
 
 const libBuildFolder = 'dist/lib'
 
