@@ -9,7 +9,7 @@ export default {
   title: 'Pdf Viewer',
   component: VuePdf,
   argTypes: {
-    name: { control: { type: 'text', required: true, default: 'Default name' } },
+    pdf: { control: { type: 'text', required: true, default: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf' } },
   },
 } as Meta;
 
@@ -29,7 +29,7 @@ export const Default = (args: any, { argTypes }) => ({
 });
 
 Default.args = {
-  name: 'Default name'
+  pdf: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
 };
 
 
