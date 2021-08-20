@@ -5,7 +5,7 @@
     "name": "Randolph Tellis"
   },
   "license": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": false,
   "main": "cjs/index.js",
   "browser": "vue3-pdfjs.esm.js",
@@ -30,7 +30,6 @@
     "build-storybook": "scripts/build-docs.sh"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
     "pdfjs-dist": "^2.9.359",
     "vue": "^3.0.0"
   },
@@ -82,9 +81,6 @@
     "typescript": "~3.9.3",
     "vue-jest": "^5.0.0-0",
     "vue-loader": "^16.1.2"
-  },
-  "peerDependencies": {
-    "vue": "^3.0.0"
   },
   "engines": {
     "node": ">=10.0.0"
