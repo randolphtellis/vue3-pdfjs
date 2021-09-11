@@ -53,7 +53,7 @@ export default defineComponent({
 
       canvasWrapper.appendChild(canvas)
       canvasWrapper.appendChild(annotationLayer)
-      pdfWrapperEl.appendChild(canvasWrapper)
+      pdfWrapperEl?.appendChild(canvasWrapper)
 
       // This gives us the page's dimensions at full scale
       const initViewport = page.getViewport({ scale: 1 } )

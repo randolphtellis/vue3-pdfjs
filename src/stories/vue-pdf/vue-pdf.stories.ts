@@ -1,4 +1,3 @@
-import { ref } from 'vue'
 import '../css/page.scss'
 import { Meta } from '@storybook/vue3'
 import VuePdf from '../../components/vue-pdf/vue-pdf.vue'
