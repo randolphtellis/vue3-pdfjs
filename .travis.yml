@@ -8,8 +8,14 @@ node_js:
 
 jobs:
   include:
-    - stage: deploy docs
+    - stage: test
+      script: npm run test:unit
+    - stage: build library
+      script: npm run build:lib
+    - stage: build docs
       script: npm run build-storybook
+    - stage: deploy docs
+      script: npm run build
       deploy:
         provider: pages
         skip_cleanup: true
