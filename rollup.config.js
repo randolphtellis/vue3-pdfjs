@@ -114,7 +114,10 @@ const external = [
   // eg. 'jquery'
   'vue',
   'pdfjs-dist/legacy/build/pdf.js',
-  'pdfjs-dist/legacy/build/pdf.worker.entry'
+  'pdfjs-dist/legacy/build/pdf.worker.entry',
+  'pdfjs-dist/types/display/api',
+  'pdfjs-dist/legacy/web/pdf_viewer',
+  'pdfjs-dist/legacy/web/pdf_viewer.css'
 ]
 
 // UMD/IIFE shared settings: output.globals
@@ -124,7 +127,9 @@ const globals = {
   // eg. jquery: '$'
   vue: 'Vue',
   'pdfjs-dist/legacy/build/pdf.js': 'pdfjsLib',
-  'pdfjs-dist/legacy/build/pdf.worker.entry': 'PDFJSWorker'
+  'pdfjs-dist/legacy/build/pdf.worker.entry': 'PDFJSWorker',
+  'pdfjs-dist/types/display/api': 'pdfjsApi',
+  'pdfjs-dist/legacy/web/pdf_viewer': 'pdfjsViewer'
 }
 
 const baseFolder = './src/'
