@@ -4,11 +4,14 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js'
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry'
 import * as pdfjsApi from 'pdfjs-dist/types/display/api'
 import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer'
+import { createLoadingTask } from './loading-task'
 import 'pdfjs-dist/legacy/web/pdf_viewer.css'
+import { PageViewport } from 'pdfjs-dist/types/display/display_utils'
 
 export interface propsType {
   src: string | URL | pdfjsApi.TypedArray | pdfjsApi.PDFDataRangeTransport | pdfjsApi.DocumentInitParameters;
   page: number;
+  scale?: number;
   enableTextSelection: boolean;
   enableAnnotations: boolean;
 }
@@ -33,6 +36,13 @@ export default defineComponent({
       default: 1
     },
     /**
+     * The scale (zoom) of the pdf. Setting this will also disable auto resizing 
+     */
+    scale: {
+      type: Number,
+      default: null
+    },
+    /**
      * Whether to enable text selection
      */
     enableTextSelection: {
@@ -51,19 +61,18 @@ export default defineComponent({
 
     const loading = ref<boolean>(false)
 
-    const pdfWrapperRef = ref<HTMLInputElement | null>(null)
-    const parentWrapperRef = ref<HTMLInputElement | null>(null)
+    const pdfWrapperRef = ref<HTMLElement | null>(null)
+    const parentWrapperRef = ref<HTMLElement | null>(null)
 
     const thePDF = ref<pdfjsApi.PDFDocumentProxy | null>(null)
     const numberOfPages = ref<number>(0)
-    const currentPage = ref<number>(1)
 
     const eventBus = ref(null)
 
     const initPdfWorker = () => {
       loading.value = true
       pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker
-      const loadingTask = pdfjsLib.getDocument(props.src)
+      const loadingTask = createLoadingTask(props.src)
       loadingTask.promise.then((pdf) => {
         ctx.emit('pdfLoaded', pdf)
         thePDF.value = pdf
@@ -75,11 +84,12 @@ export default defineComponent({
       })
     }
 
-    const renderPage = (page: pdfjsApi.PDFPageProxy) => {
+    const renderPage = async (page: pdfjsApi.PDFPageProxy) => {
 
       loading.value = true
 
       const pdfWrapperEl = pdfWrapperRef.value as HTMLElement
+      const parentWrapperEl = parentWrapperRef.value as HTMLElement
 
       // Create a wrapper for each page
       const pageWrapper = document.createElement('div')
@@ -109,15 +119,73 @@ export default defineComponent({
       // This gives us the page's dimensions at full scale
       const initViewport = page.getViewport({ scale: 1 })
       
-      const pageWrapperStyles = window.getComputedStyle(pageWrapper)
-      const pageWrapperWidth = parseFloat(pageWrapperStyles.width)
-
-      const scale = pageWrapperWidth / initViewport.width
-      const viewport = page.getViewport({scale})
-      canvas.height = viewport.height
-      canvas.width = viewport.width
 
       const context = canvas.getContext('2d')
+      await scaleCanvas(pdfWrapperEl, initViewport, page, canvas, context, textLayerDiv, annotationLayer)
+
+      if(!props.scale) {
+        const debouncedScaling = debounce(async () => await scaleCanvas(pdfWrapperEl, initViewport, page, canvas, context, textLayerDiv, annotationLayer))
+        window.addEventListener('resize', debouncedScaling);
+      } else {
+        parentWrapperEl.style.display = 'inline-block';
+        pdfWrapperEl.style.display = 'inline-block';
+      }
+    }
+
+    const scaleCanvas = async (
+      pdfWrapperEl: HTMLElement,
+      intialisedViewport: PageViewport,
+      page: pdfjsApi.PDFPageProxy,
+      canvas: HTMLCanvasElement,
+      context: any,
+      textLayerDiv: HTMLDivElement,
+      annotationLayer: HTMLDivElement
+    ) => {
+
+      textLayerDiv.innerHTML = ''
+      annotationLayer.innerHTML = ''
+
+      const pdfWrapperElStyles = window.getComputedStyle(pdfWrapperEl)
+      const pdfWrapperElWidth = parseFloat(pdfWrapperElStyles.width)
+
+      const scale = props.scale ? props.scale : pdfWrapperElWidth / intialisedViewport.width
+      const viewport = page.getViewport({scale})
+
+      // assume the device pixel ratio is 1 if the browser doesn't specify it
+      const devicePixelRatio = window.devicePixelRatio || 1;
+
+      // determine the 'backing store ratio' of the canvas context
+      const backingStoreRatio = (
+        context.webkitBackingStorePixelRatio ||
+        context.mozBackingStorePixelRatio ||
+        context.msBackingStorePixelRatio ||
+        context.oBackingStorePixelRatio ||
+        context.backingStorePixelRatio || 1
+      );
+
+      // determine the actual ratio we want to draw at
+      const ratio = devicePixelRatio / backingStoreRatio;
+
+      if (devicePixelRatio !== backingStoreRatio) {
+
+        // set the 'real' canvas size to the higher width/height
+        canvas.width = props.scale ? (viewport.width * ratio) : (pdfWrapperElWidth * ratio);
+        canvas.height = viewport.height * ratio;
+
+        // ...then scale it back down with CSS
+        canvas.style.width = props.scale ? '' : '100%';
+        canvas.style.height = viewport.height + 'px';
+      }
+      else {
+        // this is a normal 1:1 device; just scale it simply
+        canvas.width = props.scale ? viewport.width : pdfWrapperElWidth;
+        canvas.height = viewport.height;
+        canvas.style.width = '';
+        canvas.style.height = '';
+      }
+
+      // scale the drawing context so everything will work at the higher ratio
+      await context.scale(ratio, ratio);
       // Draw it on the canvas
       if (context) {
         page.render({ canvasContext: context, viewport }).promise.then(() => {
@@ -125,7 +193,9 @@ export default defineComponent({
           // Render text layer for text selection
           if (props.enableTextSelection) {
             page.getTextContent().then((textContent) => {
-              eventBus.value = new pdfjsViewer.EventBus()
+              if (!eventBus.value) {
+                eventBus.value = new pdfjsViewer.EventBus()
+              }
               // Create new instance of TextLayerBuilder class
               const textLayer = new pdfjsViewer.TextLayerBuilder({
                 textLayerDiv: textLayerDiv, 
@@ -146,8 +216,7 @@ export default defineComponent({
           if (props.enableAnnotations) {
             // Render annotation layer for clickable links
             page.getAnnotations().then((annotationData) => {
-
-              annotationLayer.style.cssText = `left: 0; top: 0; height: ${viewport.height}px; width: ${viewport.width}px;`
+              annotationLayer.style.cssText = `left: 0; top: 0; height: ${viewport.height}px; width: ${props.scale ? viewport.width : pdfWrapperElWidth}px;`
 
               // Render the annotation layer
               pdfjsLib.AnnotationLayer.render({
@@ -162,9 +231,16 @@ export default defineComponent({
             })
           }
           loading.value = false
-          ctx.emit('pageLoaded', props.page)
         })
       }
+    }
+
+    const debounce = (func: { apply: (arg0: void, arg1: any) => void }, timeout = 300) => {
+      let timer: number|undefined;
+      return (...args: any) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+      };
     }
 
     onMounted(() => {

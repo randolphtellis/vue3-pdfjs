@@ -9,7 +9,7 @@ export default {
   title: 'Pdf Viewer',
   component: VuePdf,
   argTypes: {
-    src: { control: { type: 'text', required: true, default: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf' } },
+    src: { control: { type: 'object', required: true, default: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf' } }
   },
 } as Meta;
 
@@ -24,14 +24,15 @@ export const Default = (args: any, { argTypes }) => ({
     }
   },
   template: `
-  <div style="width:90%;margin:0 auto;">
     <VuePdf v-bind="args" v-on="action" />
-  </div>
   `
 });
 
 Default.args = {
-  src: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
+  src: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
+  page: 1,
+  enableTextSelection: true,
+  enableAnnotations: true
 };
 
 
