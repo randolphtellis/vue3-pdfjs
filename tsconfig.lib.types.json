@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "declaration": true,
+    "declarationDir": "dist/lib/dts",
     "incremental": true,
     "target": "es3",
-    "module": "es2015",
+    "module": "ES2015",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,

@@ -1,28 +1,20 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js'
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry'
-import * as pdfjsApi from 'pdfjs-dist/types/display/api'
 import * as pdfjsViewer from 'pdfjs-dist/legacy/web/pdf_viewer'
+import { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist/types/src/display/api'
+import { PageViewport } from 'pdfjs-dist/types/src/display/display_utils'
 import { createLoadingTask } from './loading-task'
 import 'pdfjs-dist/legacy/web/pdf_viewer.css'
-import { PageViewport } from 'pdfjs-dist/types/display/display_utils'
-
-export interface propsType {
-  src: string | URL | pdfjsApi.TypedArray | pdfjsApi.PDFDataRangeTransport | pdfjsApi.DocumentInitParameters;
-  page: number;
-  scale?: number;
-  enableTextSelection: boolean;
-  enableAnnotations: boolean;
-}
+import { VuePdfPropsType } from './vue-pdf-props'
 
 export default defineComponent({
   name: 'vue-pdf',
 
   props: {
     /**
-     * The source of the pdf.
-     * Accepts `string | URL | TypedArray | PDFDataRangeTransport | DocumentInitParameters`
+     * The source of the pdf. Accepts the following types `string | URL | TypedArray | PDFDataRangeTransport | DocumentInitParameters`
      */
     src: {
       type: [String, Object],
@@ -36,7 +28,7 @@ export default defineComponent({
       default: 1
     },
     /**
-     * The scale (zoom) of the pdf. Setting this will also disable auto resizing 
+     * The scale (zoom) of the pdf. Setting this will also disable auto scaling and resizing. 
      */
     scale: {
       type: Number,
@@ -57,34 +49,36 @@ export default defineComponent({
       default: true
     }
   },
-  setup(props: propsType, ctx) {
+  setup(props: VuePdfPropsType, ctx) {
 
     const loading = ref<boolean>(false)
 
     const pdfWrapperRef = ref<HTMLElement | null>(null)
     const parentWrapperRef = ref<HTMLElement | null>(null)
 
-    const thePDF = ref<pdfjsApi.PDFDocumentProxy | null>(null)
+    const thePDF = ref<PDFDocumentProxy | null>(null)
     const numberOfPages = ref<number>(0)
 
     const eventBus = ref(null)
+
+    const pageNumber = computed(() => props.page || 1)
 
     const initPdfWorker = () => {
       loading.value = true
       pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker
       const loadingTask = createLoadingTask(props.src)
-      loadingTask.promise.then((pdf) => {
+      loadingTask.promise.then((pdf: PDFDocumentProxy) => {
         ctx.emit('pdfLoaded', pdf)
         thePDF.value = pdf
         numberOfPages.value = pdf.numPages
         ctx.emit('totalPages', numberOfPages.value)
-        if (props.page <= numberOfPages.value) {
-          pdf.getPage(props.page).then((page) => renderPage(page))
+        if (pageNumber.value <= numberOfPages.value) {
+          pdf.getPage(pageNumber.value).then((page: PDFPageProxy) => renderPage(page))
         }
       })
     }
 
-    const renderPage = async (page: pdfjsApi.PDFPageProxy) => {
+    const renderPage = async (page: PDFPageProxy) => {
 
       loading.value = true
 
@@ -135,7 +129,7 @@ export default defineComponent({
     const scaleCanvas = async (
       pdfWrapperEl: HTMLElement,
       intialisedViewport: PageViewport,
-      page: pdfjsApi.PDFPageProxy,
+      page: PDFPageProxy,
       canvas: HTMLCanvasElement,
       context: any,
       textLayerDiv: HTMLDivElement,

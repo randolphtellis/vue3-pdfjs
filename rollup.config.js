@@ -115,8 +115,8 @@ const external = [
   'vue',
   'pdfjs-dist/legacy/build/pdf.js',
   'pdfjs-dist/legacy/build/pdf.worker.entry',
-  'pdfjs-dist/types/display/api',
   'pdfjs-dist/legacy/web/pdf_viewer',
+  'pdfjs-dist/types/src/display/api',
   'pdfjs-dist/legacy/web/pdf_viewer.css'
 ]
 
@@ -128,7 +128,6 @@ const globals = {
   vue: 'Vue',
   'pdfjs-dist/legacy/build/pdf.js': 'pdfjsLib',
   'pdfjs-dist/legacy/build/pdf.worker.entry': 'PDFJSWorker',
-  'pdfjs-dist/types/display/api': 'pdfjsApi',
   'pdfjs-dist/legacy/web/pdf_viewer': 'pdfjsViewer'
 }
 
