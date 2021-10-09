@@ -1,3 +1,5 @@
 export const singleSource = `
-<VuePdf v-bind="$props" />
+<VuePdf
+ v-bind="$props"
+/>
 `;

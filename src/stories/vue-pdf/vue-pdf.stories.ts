@@ -3,12 +3,13 @@ import { Meta } from '@storybook/vue3'
 import VuePdf from '../../components/vue-pdf/vue-pdf.vue'
 import { templateSourceCode } from '../utilities/template-source'
 import { singleSource } from './source-code'
+import { actions } from '@storybook/addon-actions'
 
 export default {
   title: 'Pdf Viewer',
   component: VuePdf,
   argTypes: {
-    pdf: { control: { type: 'text', required: true, default: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf' } },
+    src: { control: { type: 'object', required: true, default: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf' } }
   },
 } as Meta;
 
@@ -16,19 +17,22 @@ export const Default = (args: any, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { VuePdf },
   setup() {
+    const action = actions('totalPages', 'pdfLoaded', 'textContent', 'pageLoaded')
     return {
-      args
+      args,
+      action
     }
   },
   template: `
-  <div>
-    <VuePdf v-bind="args" />
-  </div>
+    <VuePdf v-bind="args" v-on="action" />
   `
 });
 
 Default.args = {
-  pdf: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf'
+  src: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
+  page: 1,
+  enableTextSelection: true,
+  enableAnnotations: true
 };
 
 
