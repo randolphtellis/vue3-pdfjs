@@ -14,7 +14,7 @@ export default defineComponent({
 
   props: {
     /**
-     * The source of the pdf. Accepts the following types `string | URL | TypedArray | PDFDataRangeTransport | DocumentInitParameters`
+     * The source of the pdf. Accepts the following types `string | URL | Uint8Array | PDFDataRangeTransport | DocumentInitParameters`
      */
     src: {
       type: [String, Object],
