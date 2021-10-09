@@ -37,7 +37,7 @@ app.mount('#app')
 
 Import components from the `esm` folder to enable tree shaking.
 Please note that Mozilla's pdfjs npm package does not export tree-shakeable ES modules. Info here - https://github.com/mozilla/pdf.js/issues/12900
-```jsx
+```ts
 <script lang="ts">
 import { defineComponent, onMounted, reactive, ref } from 'vue';
 import { VuePdf, createLoadingTask } from 'vue3-pdfjs/esm';
