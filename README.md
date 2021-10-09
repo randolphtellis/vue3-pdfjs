@@ -33,15 +33,40 @@ app.mount('#app')
 
 
 
-### Tree Shaking
-#### Import components from the `esm` folder to enable tree shaking.
-```ts
-<script>
-import { defineComponent } from 'vue'
-import { VuePdf } from 'vue3-pdfjs/esm'
+### Basic Example
+
+Import components from the `esm` folder to enable tree shaking.
+Please note that Mozilla's pdfjs npm package does not export tree-shakeable ES modules. Info here - https://github.com/mozilla/pdf.js/issues/12900
+```tsx
+<script lang="ts">
+import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { VuePdf, createLoadingTask } from 'vue3-pdfjs/esm';
+import { VuePdfPropsType } from 'vue3-pdfjs/components/vue-pdf/vue-pdf-props'; // Prop type definitions can also be imported
+import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
+
 
 export default defineComponent({
-  components: { VuePdf }
-})
+  name: 'Home',
+  components: { VuePdf },
+  setup() {
+    const pdfSrc = ref<VuePdfPropsType['src']>('https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf')
+    const numOfPages = ref(0)
+
+    onMounted(() => {
+      const loadingTask = createLoadingTask(pdfSrc.value)
+      loadingTask.promise.then((pdf: PDFDocumentProxy) => {
+        numOfPages.value = pdf.numPages
+      })
+    })
+    return {
+      pdfSrc,
+      numOfPages
+    }
+  }
+});
 </script>
+
+<template>
+  <VuePdf v-for="page in numOfPages" :key="page" :src="pdfSrc" :page="page" />
+</template>
 ```
