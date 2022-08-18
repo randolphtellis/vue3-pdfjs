@@ -236,7 +236,7 @@ export default defineComponent({
 
               if (!linkService.value) {
                 linkService.value = new pdfjsViewer.PDFLinkService({
-                  eventBus,
+                  eventBus: eventBus.value,
                   externalLinkEnabled: true,
                   externalLinkRel: 'noopener noreferrer nofollow',
                   externalLinkTarget: 2 // Blank
