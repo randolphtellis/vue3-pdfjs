@@ -47,6 +47,13 @@ export default defineComponent({
     enableAnnotations: {
       type: Boolean,
       default: true
+    },
+    /**
+     * page wrapper id prefix
+     */
+    wrapperIdPrefix: {
+      type: String,
+      default: 'vue-pdf-page'
     }
   },
   setup(props: VuePdfPropsType, ctx) {
@@ -62,6 +69,7 @@ export default defineComponent({
     const eventBus = ref(null)
 
     const pageNumber = computed(() => props.page || 1)
+    const wrapperIdPrefix = computed(() => props.wrapperIdPrefix || 'vue-pdf-page')
 
     const initPdfWorker = () => {
       loading.value = true
@@ -88,7 +96,7 @@ export default defineComponent({
       // Create a wrapper for each page
       const pageWrapper = document.createElement('div')
       pageWrapper.classList.add('vue-pdf__wrapper')
-      pageWrapper.id = `vue-pdf-page-${props.page}`
+      pageWrapper.id = `${wrapperIdPrefix.value}-${page.pageNumber}`
 
       // Create a canvas element for each page to draw on
       const canvas = document.createElement('canvas')

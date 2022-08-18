@@ -6,4 +6,5 @@ export interface VuePdfPropsType {
   scale?: number;
   enableTextSelection?: boolean;
   enableAnnotations?: boolean;
+  wrapperIdPrefix?: string;
 }
