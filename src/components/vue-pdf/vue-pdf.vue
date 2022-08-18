@@ -255,6 +255,7 @@ export default defineComponent({
             })
           }
           loading.value = false
+          ctx.emit('pageLoaded', page)
         })
       }
     }
