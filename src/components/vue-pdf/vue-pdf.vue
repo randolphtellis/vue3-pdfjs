@@ -28,6 +28,13 @@ export default defineComponent({
       default: 1
     },
     /**
+     * Whether to display all pages, dangerous!!
+     */
+    allPages: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * The scale (zoom) of the pdf. Setting this will also disable auto scaling and resizing. 
      */
     scale: {
@@ -69,6 +76,7 @@ export default defineComponent({
     const eventBus = ref(null)
 
     const pageNumber = computed(() => props.page || 1)
+    const allPages = computed(() => Boolean(props.allPages))
     const wrapperIdPrefix = computed(() => props.wrapperIdPrefix || 'vue-pdf-page')
 
     const initPdfWorker = () => {
@@ -80,7 +88,11 @@ export default defineComponent({
         thePDF.value = pdf
         numberOfPages.value = pdf.numPages
         ctx.emit('totalPages', numberOfPages.value)
-        if (pageNumber.value <= numberOfPages.value) {
+        if (allPages.value) {
+          // ignore pageNumber, display all pages
+          const pagePromiseArr = new Array(numberOfPages.value).fill(0).map((v, idx) => pdf.getPage(idx + 1))
+          Promise.all(pagePromiseArr).then(pages => pages.forEach(renderPage));
+        } else if (pageNumber.value <= numberOfPages.value) {
           pdf.getPage(pageNumber.value).then((page: PDFPageProxy) => renderPage(page))
         }
       })
