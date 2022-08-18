@@ -28,6 +28,13 @@ export default defineComponent({
       default: 1
     },
     /**
+     * Whether to display all pages, dangerous!!
+     */
+    allPages: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * The scale (zoom) of the pdf. Setting this will also disable auto scaling and resizing. 
      */
     scale: {
@@ -62,6 +69,7 @@ export default defineComponent({
     const eventBus = ref(null)
 
     const pageNumber = computed(() => props.page || 1)
+    const allPages = computed(() => Boolean(props.allPages))
 
     const initPdfWorker = () => {
       loading.value = true
@@ -72,7 +80,12 @@ export default defineComponent({
         thePDF.value = pdf
         numberOfPages.value = pdf.numPages
         ctx.emit('totalPages', numberOfPages.value)
-        if (pageNumber.value <= numberOfPages.value) {
+        if (allPages.value) {
+          // ignore pageNumber, render all
+          for (let p = 1; p <= numberOfPages.value; p += 1) {
+            pdf.getPage(p).then((page: PDFPageProxy) => renderPage(page))
+          }
+        } else if (pageNumber.value <= numberOfPages.value) {
           pdf.getPage(pageNumber.value).then((page: PDFPageProxy) => renderPage(page))
         }
       })
